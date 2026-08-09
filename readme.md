@@ -197,8 +197,7 @@ output = graph > 0.5 ? input : 0
 
 ## Loops
 Since most operations happen on entire buffers, you generally do not need loops. However, you still can write for-loops and while-loops if
-you need them. But keep in mind that these are extremely slow compared to simple buffer operations! But still, if you need something like a 
-cummulative loop, you can still write them like this:
+you need them. But keep in mind that these are extremely slow compared to simple buffer operations! But still, if you need them, you can still write them like this:
 
 ```
 for (index = 0; index < size; index = index + 1) {
