@@ -1,0 +1,40 @@
+    
+// ------------------------------------------------
+
+@name "Env"
+@inplace true
+
+@graph eq base = 0.5
+
+@param 0 name = "Mix"      default = 1.0   transform = range[0, 100]       format = percent 
+@param 1 name = "Attack"   default = 0.0   transform = power[0, 10000, 2]  format = time 
+@param 2 name = "Release"  default = 0.0   transform = power[0, 10000, 2]  format = time 
+@param 3 name = "Hold"     default = 0.0   transform = power[0, 10000, 2]  format = time 
+
+@data stereo_buffer envelope
+@data stereo_buffer hold_counter
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1)
+param1 = max(param[1], 0)
+param2 = max(param[2], 0)
+param3 = max(param[3], 0)
+
+// ------------------------------------------------
+
+mix = param0
+attack_samples = param1 * param1 * 10 * sample_rate
+release_samples = param2 * param2 * 10 * sample_rate
+hold_samples = param3 * param3 * 10 * sample_rate
+
+// ------------------------------------------------
+
+in_attack_stage = abs(envelope) < abs(input)
+hold_counter = in_attack_stage ? hold_samples : max(hold_counter - 1, 0)
+samples = in_attack_stage ? attack_samples : release_samples
+coefficient = exp(-1 / max(graph * samples, 0.000000000001))
+envelope = !in_attack_stage && hold_counter > 0 ? envelope : lerp(coefficient, input, envelope)
+output = lerp(mix, input, envelope)
+
+// ------------------------------------------------

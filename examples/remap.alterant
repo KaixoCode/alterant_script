@@ -1,0 +1,41 @@
+
+// ------------------------------------------------
+
+@name "Remap"
+@inplace false
+
+@graph line points = [0, 0] [1, 1] 
+
+@param 0 name = "Mix"       default = 1.0  transform = range[   0, 100]  format = percent
+@param 1 name = "Morph"     default = 0.0  transform = range[   0, 100]  format = percent
+@param 2 name = "Offset"    default = 0.5  transform = range[-100, 100]  format = percent
+@param 3 name = "Shift"     default = 0.5  transform = range[-400, 400]  format = percent
+@param 4 name = "Key Track" default = 0.0  transform = range[   0, 100]  format = percent
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1)
+param1 = clamp(param[1], 0, 1)
+param4 = clamp(param[4], 0, 1)
+
+// ------------------------------------------------
+
+mix = param0
+index_mix = 1 - param1
+offset = size * (param[2] * 2.0 - 1.0)
+shift = param[3] < 0.5 ? (1 / (5 - 8 * param[3])) : (8 * param[3] - 3)
+freeze = 1 - param4
+
+// ------------------------------------------------
+
+remapped_index = graph * size - 0.5
+frozen = remapped_index * (39.06 / lerp(freeze, frequency, 39.06))
+transformed = (frozen - offset) * (1.0 / shift)
+mixed_index = lerp(index_mix, i, transformed)
+if (wrap) {
+  output = lerp(mix, input, input[mixed_index : linear wrap])
+} else {
+  output = lerp(mix, input, input[mixed_index : linear zero])
+}
+
+// ------------------------------------------------

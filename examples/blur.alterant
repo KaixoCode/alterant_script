@@ -1,0 +1,38 @@
+    
+// ------------------------------------------------
+
+@name "Blur"
+@inplace false
+
+@graph eq base = 0.5
+
+@param 0 name = "Mix"   default = 1.0   transform = range[0, 100]  format = percent 
+@param 1 name = "Blur"  default = 0.5   transform = range[1,  16]  format = default 
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1)
+param1 = clamp(param[1], 0, 1)
+
+// ------------------------------------------------
+
+mix = param0
+blur = param1 * param1
+max_kernel_radius = 24
+
+// ------------------------------------------------
+
+sigma = 0.01 + graph * blur * (max_kernel_radius / 2)
+
+output = 0
+sum = input
+for (k = 1; k <= max_kernel_radius; k = k + 1) {
+  weight = pow(1 / ((0.333 * k * k) / sigma + 1), 2)
+  sum = sum + weight * (input[i + k : zero] + input[i - k : zero])
+  output = output + weight
+}
+
+output = sum / (2 * output + 1)
+output = lerp(mix, input, output)
+
+// ------------------------------------------------

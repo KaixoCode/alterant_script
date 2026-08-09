@@ -1,0 +1,41 @@
+
+// ------------------------------------------------
+
+@name "Gate"
+@inplace true
+
+@graph eq base = 0.0
+
+@param 0 name = "Mix"      default = 1.0  transform = range[   0, 100]   format = percent 
+@param 1 name = "Morph"    default = 0.0  transform = range[   0, 100]   format = percent 
+@param 2 name = "Offset"   default = 0.5  transform = range[-100, 100]   format = percent 
+@param 3 name = "Attack"   default = 0.0  transform = power[0, 1000, 3]  format = time 
+@param 4 name = "Release"  default = 0.0  transform = power[0, 1000, 3]  format = time 
+
+@data stereo_buffer envelope
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1)
+param1 = clamp(param[1], 0, 1)
+param3 = max(param[3], 0)
+param4 = max(param[4], 0)
+
+// ------------------------------------------------
+
+mix = param0
+morph = 1 - param1
+offset = param[2] * 2 - 1
+attack  = exp(-1 / (0.000000001 + pow(param3, 3) * sample_rate))
+release = exp(-1 / (0.000000001 + pow(param4, 3) * sample_rate))
+
+// ------------------------------------------------
+
+gate_threshold = offset + morph * graph
+abs_input = abs(input)
+target_gain = abs_input < gate_threshold ? 0 : 1
+coefficient = envelope < target_gain ? attack : release
+envelope = target_gain + (envelope - target_gain) * coefficient
+output = lerp(mix, input, input * envelope)
+
+// ------------------------------------------------

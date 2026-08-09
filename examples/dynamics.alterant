@@ -1,0 +1,62 @@
+    
+// ------------------------------------------------
+
+@name "Dyna"
+@inplace false
+
+@graph eq base = 0.5
+
+@param 0 name = "Intensity"  default = 1.0  transform = range[   0, 100]      format = percent 
+@param 1 name = "Radius"     default = 0.1  transform = power[   1, 512, 3]   format = default 
+@param 2 name = "Peaks"      default = 1.0  transform = range[-100, 100]      format = percent 
+@param 3 name = "Valleys"    default = 1.0  transform = range[-100, 100]      format = percent
+@param 4 name = "Pivot"      default = 0.5  transform = range[-100, 100]      format = percent
+
+@data stereo_buffer running_sum
+
+// ------------------------------------------------
+
+param0 = max(param[0], 0)
+param1 = clamp(param[1], 0, 1)
+
+// ------------------------------------------------
+
+intensity = param0 * 4
+radius = 1 + param1 * param1 * param1 * (size - 1)
+peak_bias = param[2] * 2 - 2
+valley_bias = param[3] * 2 - 2
+pivot_bias = param[4] * 2 - 1
+valley_gain = 1 + valley_bias;
+peak_gain = 1 + peak_bias;
+
+// ------------------------------------------------
+
+radius_int = floor(radius)
+fractional = radius - radius_int
+window_size = max(2 * radius_int + 1 + 2 * fractional, 1)
+
+// ------------------------------------------------
+
+abs_input = abs(input)
+
+running_sum[0] = 0;
+for (index = 0; index < size - 1; index = index + 1) {
+  running_sum[index + 1] = running_sum[index] + abs_input[index]
+}
+
+start_index = max(i - radius_int, 0)
+end_index   = min(i + radius_int + 1, size - 1)
+sum = running_sum[end_index] - running_sum[start_index]
+if (fractional > 0) {
+  sum = sum + abs(input[max(start_index - 1, 0)] + input[min(end_index + 1, size - 1)]) * fractional
+}
+
+average = sum / window_size
+pivot = average * (1 + pivot_bias)
+difference = abs_input - pivot
+gain = difference < 0 ? valley_gain : peak_gain
+contrast = max(abs_input + graph * intensity * gain * difference, 0)
+
+output = input < 0 ? -contrast : contrast
+
+// ------------------------------------------------

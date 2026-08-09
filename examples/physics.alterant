@@ -1,0 +1,109 @@
+
+// ------------------------------------------------
+
+@name "Phys"
+@inplace false
+
+@graph eq base = 0.5
+
+@param 0 name = "Mix"       default = 1.0   transform = range[0, 100]  format = percent 
+@param 1 name = "Slope"     default = 0.5   transform = range[0, 100]  format = percent 
+@param 2 name = "Friction"  default = 0.0   transform = range[0, 100]  format = percent 
+@param 3 name = "Spring"    default = 0.0   transform = range[0, 100]  format = percent
+@param 4 name = "Drift"     default = 0.0   transform = range[0, 100]  format = percent
+
+@data stereo_buffer position
+@data stereo_buffer velocity
+@data scalar time
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1);
+param1 = max(param[1], 0);
+param2 = max(param[2], 0);
+param3 = max(param[3], 0);
+param4 = max(param[4], 0);
+
+// ------------------------------------------------
+
+mix = param0;
+slope_scale = 8 * param1 * param1;
+friction = param2 * param2 * 0.01;
+spring = 4 * param3 * param3 / size;
+drift = param4 * param4 * param4 * 0.1;
+spring_friction = 0.2 * sqrt(spring);
+    
+// ------------------------------------------------
+
+if (trigger) {
+  position = i
+}
+
+// ------------------------------------------------
+
+output = 0
+
+for (index = 0; index < size; index = index + 1) {
+  remapped = position[index];
+  output[remapped] = max(output[remapped], input[index]);
+}
+
+output = lerp(mix, input, output)
+
+dt = 375 / sample_rate;
+time = (time + dt) % 1;
+if (time >= dt) return; // Only update at fixed rate
+
+// ------------------------------------------------
+
+random_value = stereo(noise(-1, 1), noise(-1, 1)) * 2
+
+if (wrap) {
+    slope_at_0 = graph[0] - graph[1];
+
+    graph_index = floor(position)
+    slope_on_graph = graph[graph_index] - graph[graph_index + 1]
+    // Special case when position at end, to make sure it 
+    // doesn't take slope between indices 0 and 511
+    slope_on_graph = position > size - 1 - velocity ? slope_at_0 : slope_on_graph
+
+    delta = ((i - position + 0.5 * size) % size) - 0.5 * size
+
+    acceleration = 
+        slope_scale * slope_on_graph        // Slope component
+      + drift       * random_value          // Drift component
+      + spring      * clamp(delta, -16, 16) // Spring component
+      - velocity    * spring_friction;      // Spring friction component
+
+    position = (position + velocity) % size
+    velocity = clamp((velocity + acceleration) * (1 - friction), -16, 16)
+} else {
+    graph_index0 = floor(position)
+    graph_index1 = graph_index0 > size - 2 
+                 ? graph_index0 - 1
+                 : graph_index0 + 1
+
+    slope_on_graph = graph[graph_index0 : clamp] - graph[graph_index1 : clamp]
+    
+    delta = i - position
+
+    acceleration = 
+        slope_scale * slope_on_graph        // Slope component
+      + drift       * random_value          // Drift component
+      + spring      * clamp(delta, -16, 16) // Spring component
+      - velocity    * spring_friction;      // Spring friction component
+
+    position = position + velocity
+    velocity = clamp((velocity + acceleration) * (1 - friction), -16, 16)
+
+    // Handle case where it bounces off the edge
+    is_under = position < 0
+    is_over  = position >= size
+
+    position = is_under ? -position : position
+    position = is_over ? 2 * size - position : position
+
+    velocity = is_under || is_over ? -velocity : velocity
+}
+
+// ------------------------------------------------

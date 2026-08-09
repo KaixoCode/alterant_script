@@ -1,0 +1,47 @@
+
+// ------------------------------------------------
+
+@name "Level"
+@inplace true
+
+@graph eq base = 0.5
+
+@param 0 name = "Graph"   default = 1.0  transform = range[-100, 100]  format = percent 
+@param 1 name = "Gain"    default = 0.5  transform = range[   0, 200]  format = percent 
+@param 2 name = "Offset"  default = 1.0  transform = range[-100, 0  ]  format = percent 
+@param 3 name = "Width"   default = 1.0  transform = range[-100, 100]  format = percent
+@param 4 name = "Pan"     default = 0.5  transform = range[-100, 100]  format = pan 
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1)
+param1 = max(param[1], 0)
+param2 = min(param[2], 1)
+param3 = clamp(param[3], 0, 1)
+param4 = clamp(param[4], 0, 1)
+
+mix = param0 * 2 - 1
+gain = param1 * 2
+offset = param2 - 1
+width = param3
+pan = 2 * stereo(cos(param4 * 0.5 * pi),
+                 sin(param4 * 0.5 * pi)) / sqrt2
+
+// ------------------------------------------------
+
+level = pan * max((graph - 0.5) * mix + 0.5, 0)
+
+mid     =  input.left  + input.right
+side    = (input.left  - input.right) * max(width * 2 - 1, 0)
+sideInv = (input.right - input.left)  * max(1 - width * 2, 0)
+
+result = stereo(mid + side + sideInv, 
+                mid - side - sideInv)
+
+if (bipolar) {
+  output = gain * level * (result + offset)
+} else {
+  output = gain * level * max(abs(result) + offset, 0)
+}
+
+// ------------------------------------------------

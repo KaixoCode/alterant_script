@@ -1,0 +1,61 @@
+    
+// ------------------------------------------------
+
+@name "Rand"
+@inplace false
+
+@graph eq base = 0.5
+
+@param 0 name = "Mix"       default = 1.0   transform = range[   0,  100]      format = percent 
+@param 1 name = "Cycle"     default = 0.5   transform = power[   1, 1000, 2]   format = time 
+@param 2 name = "Integrity" default = 0.23  transform = range[   1,  100]      format = percent 
+@param 3 name = "Randomize" default = 1.0   transform = range[   0,  100]      format = percent
+@param 4 name = "Stereo"    default = 1.0   transform = range[   0,  100]      format = percent
+
+@data stereo_buffer counter
+@data stereo_buffer state
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1);
+param1 = max(param[1], 0);
+param2 = clamp(param[2], 0, 1);
+param3 = clamp(param[3], 0, 1);
+param4 = clamp(param[4], 0, 1);
+
+// ------------------------------------------------
+
+mix = param0;
+base_cycle = (1 + 999 * param1 * param1) * 0.001 * sample_rate;
+integrity = param2 * 0.99 + 0.01;
+speed_randomness = 2 * param3;
+stereo_amount = param4 * param4 * param4;
+
+// ------------------------------------------------
+
+local_integrity = pow(clamp(integrity / max(graph * 2, 0.0000000001), 0, 1), 2)
+
+counter_mono = min(counter.left, counter.left)
+counter = counter_mono + stereo_amount * (counter - counter_mono)
+expired = counter < 0
+
+use_mono = noise() > stereo_amount
+
+random_speed_mono = noise(-1, 1)
+random_speed_stereo = stereo(noise(-1, 1), noise(-1, 1))
+random_speed = use_mono ? random_speed_mono : random_speed_stereo
+new_cycle = base_cycle * (1 + speed_randomness * random_speed)
+
+random_state_mono = noise(0, 1)
+random_state_stereo = stereo(noise(0, 1), noise(0, 1))
+random_state = use_mono ? random_state_mono : random_state_stereo
+new_state = random_state < local_integrity ? 1 : 0
+
+counter = expired ? new_cycle : counter
+state   = expired ? new_state : state
+
+counter = counter - 1
+
+output = input + mix * (input * state - input)
+
+// ------------------------------------------------

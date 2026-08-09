@@ -1,0 +1,100 @@
+    
+// ------------------------------------------------
+
+@name "Scat"
+@inplace false
+
+@graph eq base = 0.5
+
+@param 0 name = "Mix"     default = 1.0   transform = range[0, 100]  format = percent 
+@param 1 name = "Radius"  default = 0.01  transform = range[0, 100]  format = percent 
+@param 2 name = "Speed"   default = 0.0   transform = range[0, 100]  format = percent 
+
+@data buffer scatter0
+@data buffer scatter1
+@data scalar scatter_morph
+@data scalar read_buffer
+
+// ------------------------------------------------
+
+param0 = clamp(param[0], 0, 1)
+param1 = clamp(param[1], 0, 1)
+param2 = max(param[2], 0)
+
+// ------------------------------------------------
+
+mix = param0
+global_strength = param1 * size
+morph_speed = 0.005 * param2 * param2 * param2
+
+// ------------------------------------------------
+
+if (trigger) {
+  scatter0 = i
+  scatter1 = i
+
+  random_offset0 = noise(0, 1) * (size - 1)
+  random_offset1 = noise(0, 1) * (size - 1)
+
+  for (index = 0; index < size; index = index + 1) {
+    swapped_index0 = random_offset0[index]
+    swapped_index1 = random_offset1[index]
+    a0 = scatter0[index]
+    a1 = scatter1[index]
+    scatter0[index] = scatter0[swapped_index0]
+    scatter1[index] = scatter1[swapped_index1]
+    scatter0[swapped_index0] = a0
+    scatter1[swapped_index1] = a1
+  }
+
+  scatter0 = scatter0 - i
+  scatter1 = scatter1 - i
+}
+
+// ------------------------------------------------
+
+dt = 375 / sample_rate
+scatter_morph = scatter_morph + morph_speed * dt;
+if (scatter_morph >= 1) {
+  scatter_morph = scatter_morph - 1;
+  read_buffer = 1 - read_buffer;
+  
+  if (read_buffer == 0) {
+    scatter0 = i
+
+    random_offset = noise(0, 1) * (size - 1)
+
+    for (index = 0; index < size; index = index + 1) {
+      swapped_index = random_offset[index]
+      a = scatter0[index]
+      scatter0[index] = scatter0[swapped_index]
+      scatter0[swapped_index] = a
+    }
+
+    scatter0 = scatter0 - i
+  } else {
+    scatter1 = i
+
+    random_offset = noise(0, 1) * (size - 1)
+
+    for (index = 0; index < size; index = index + 1) {
+      swapped_index = random_offset[index]
+      a = scatter1[index]
+      scatter1[index] = scatter1[swapped_index]
+      scatter1[swapped_index] = a
+    }
+
+    scatter1 = scatter1 - i
+  }
+}
+
+// ------------------------------------------------
+
+current_scatter = read_buffer == 0 
+               ? lerp(scatter_morph, scatter1, scatter0) 
+               : lerp(scatter_morph, scatter0, scatter1)
+absoluteScatter = abs(current_scatter)
+mapped_index = absoluteScatter < graph * global_strength ? i + current_scatter : i
+output = lerp(mix, input, input[mapped_index])
+
+// ------------------------------------------------
