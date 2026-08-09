@@ -67,9 +67,9 @@ Note how operators like `+=` or `++` are not supported!
 | `a >> b`   | Bitwise shift right.                                    | `!a`                | Logic not.                                                |
 | `a && b`   | Logic and.                                              | `~a`                | Bitwise not.                                              |
 | `a \|\| b` | Logic or.                                               | `a ? b : c`         | Ternary conditional.                                      |
-| `a & b`    | Bitwise and and.                                        | `a = b`             | Assignment.                                               |
-| `a \| b`   | Bitwise and or.                                         | `a()`               | Function call.                                            |
-| `a ^ b`    | Bitwise and xor.                                        | `a[]`               | Indexing.                                                 |
+| `a & b`    | Bitwise and.                                            | `a = b`             | Assignment.                                               |
+| `a \| b`   | Bitwise or.                                             | `a()`               | Function call.                                            |
+| `a ^ b`    | Bitwise xor.                                            | `a[]`               | Indexing.                                                 |
 | `a < b`    | Less than.                                              | `a.left`, `a.right` | Accessing left and right channels of a stereo value.      |
 | `a <= b`   | Less than or equals.                                    | `a, b`              | Comma operator. Returns the last expression in the list.  |
 
@@ -181,10 +181,10 @@ You can also configure a global boundary and interpolation mode using a config s
 Like in any programming language, it is also possible to write an if-statement.
 
 ```
-if (wrap)
-  output = input[graph * size : wrap]
-else {
-  output = input[graph * size : clamp]
+if (wrap) {
+  output = input[graph * size : wrap];
+} else {
+  output = input[graph * size : clamp];
 }
 ```
 
@@ -210,8 +210,8 @@ Or as a while-loop:
 ```
 index = 0;
 while (index < size) {
-  output[index + 1] = output[index]
-  index = index + 1
+  output[index + 1] = output[index];
+  index = index + 1;
 }
 ```
 
@@ -220,7 +220,7 @@ These loops also support `break` and `continue` statements.
 ## Persistent Data
 For some algorithms you might need persistent data, like for an envelope follower for example.
 You can add any number of persistent variables to the script by defining them using the `@data` configuration.
-This persistent data will keep its value for as long as the voice that the alterant influence is active.
+This persistent data will keep its value for as long as the voice that the alterant influences is active.
 The data is fully reset to 0 when a voice is retriggered. You can use the `trigger` global to
 initialize your persistent data to any value you want.
 
@@ -261,9 +261,10 @@ Examples:
 
 ### `@inplace`
 Whether the algorithm works inplace, meaning it can use the same output buffer as the input buffer.
-This is `true` by default.
 
 Usage: `@inplace <true|false>`
+
+Defaults to: `@inplace true`
 
 Examples:
 ```
@@ -278,6 +279,8 @@ Usage: `@graph <line|eq|bar|none> [base=<number>] [points=<points>]`
 
 Where `<points>` is 1 or more `[<number>, <number>]` or `[<number>, <number>, <number>]` separated by spaces.
 
+Defaults to: `@graph none base=0.5`
+
 Examples:
 ```
 @graph none
@@ -287,7 +290,7 @@ Examples:
 ```
 
 ### `@param`
-Configure parameters.
+Configure parameters. Only parameters added as a config and have been given a name show up in the UI.
 
 Usage: `@param <0|1|2|3|4> [name=<string|identifier>] [default=<number>] [transform=<transform>] [format=<format>]`
 
@@ -328,6 +331,8 @@ Set the default boundary handling.
 
 Usage: `@boundary <fast|wrap|clamp|zero>`
 
+Defaults to: `@boundary fast`
+
 Examples:
 ```
 @boundary fast
@@ -338,6 +343,8 @@ Examples:
 Set the default interpolation handling.
 
 Usage: `@interpolation <fast|none|linear>`
+
+Defaults to: `@interpolation fast`
 
 Examples:
 ```
