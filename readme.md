@@ -93,6 +93,10 @@ Each script has access to some globals. Here is that list of globals:
 | bipolar       | Boolean that is true if the data coming into the alterant is bipolar. If any bipolar table feeds data into this alterant, it is set to true. |
 | key_tracked   | Boolean that is true if the data coming into the alterant is key tracked. If all tables that feed into this alterant are key tracked, it is set to true. |
 | phase_data    | Boolean that is true if the data coming into the alterant is phase data. If all tables that feed into this alterant are phase data, it is set to true. |
+| interpolate   | Boolean that is true if the data coming into the alterant is interpolated. If any interpolated table feeds data into this alterant, it is set to true. |
+| nyquist       | The highest frequency represented in the spectral data. This is half the sample-rate of the audio that was analyzed to create this spectral data. |
+| hop_size      | Distance in samples between consecutive frames from the incoming spectral data. If multiple tables feed into this alterant, the highest hop size is taken. |
+| overlap       | The amount of overlap between consecutive frames from the incoming spectral data. Either 1, 2, 4, or 8. If multiple tables feed into this alterant, the highest overlap is taken. |
 
 Note that these are treated as keywords, you cannot define any variable with these names.
 
@@ -171,10 +175,26 @@ temp = max(output[i], input[i])
 output[graph * size : linear wrap] = temp[i]
 ```
 
-You can also configure a global boundary and interpolation mode using a config statement. If you do not specify a boundary or interpolation mode in the indexing operator, it will fall back to these. By default they are both set to `fast`.
+You can configure how to handle multiple writes using the scatter mode. There are 5 scatter modes:
+- `last` mode is the default, and just keeps the last written value.
+- `min` mode takes the value with the lowest magnitude. Keep in mind this includes the value already in the buffer, so if the buffer is filled with 0s it won't write anything else to the buffer in this mode.
+- `max` mode takes the value with the highest magnitude. Also includes the value already in the buffer.
+- `add` mode doesn't actually assign the new value, it imply adds it to the current value.
+- `mult` mode multiplies the current value.
+
+You can also use `fast` here, which will just default to `last`.
+
+So if we want to do what we tried to do before, and keep the maximum value from the input, we can write it like this:
+```
+output[i] = 0
+output[graph * size : linear wrap max] = input[i]
+```
+
+You can also configure a global boundary, scatter mode, and interpolation mode using a config statement. If you do not specify a boundary or interpolation mode in the indexing operator, it will fall back to these. By default these are all set to `fast`.
 ```
 @boundary clamp
 @interpolation linear
+@scatter max
 ```
 
 ## Conditionals
@@ -349,5 +369,18 @@ Examples:
 ```
 @interpolation none
 @interpolation linear
+```
+
+### `@scatter`
+Set the default scatter mode.
+
+Usage: `@scatter <fast|last|min|max|add|mult>`
+
+Defaults to: `@scatter fast`
+
+Examples:
+```
+@scatter fast
+@scatter add
 ```
 

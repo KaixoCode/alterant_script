@@ -42,12 +42,7 @@ if (trigger) {
 // ------------------------------------------------
 
 output = 0
-
-for (index = 0; index < size; index = index + 1) {
-  remapped = position[index];
-  output[remapped] = max(output[remapped], input[index]);
-}
-
+output[position : max] = input
 output = lerp(mix, input, output)
 
 dt = 375 / sample_rate;

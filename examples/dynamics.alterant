@@ -39,17 +39,13 @@ window_size = max(2 * radius_int + 1 + 2 * fractional, 1)
 
 abs_input = abs(input)
 
-running_sum[0] = 0;
-for (index = 0; index < size - 1; index = index + 1) {
-  running_sum[index + 1] = running_sum[index] + abs_input[index]
-}
+running_sum = abs_input[i - 1 : zero]
+running_sum[i + 1 : add zero] = running_sum
 
 start_index = max(i - radius_int, 0)
 end_index   = min(i + radius_int + 1, size - 1)
 sum = running_sum[end_index] - running_sum[start_index]
-if (fractional > 0) {
-  sum = sum + abs(input[max(start_index - 1, 0)] + input[min(end_index + 1, size - 1)]) * fractional
-}
+    + abs(input[max(start_index - 1, 0)] + input[min(end_index + 1, size - 1)]) * fractional
 
 average = sum / window_size
 pivot = average * (1 + pivot_bias)
