@@ -2,15 +2,17 @@
 // ------------------------------------------------
 
 @name "Dyna"
+@author "Kaixo"
+@description "The Dynamics Alterant gives you controls to adjust the contrast between neighbouring bins."
 @inplace false
 
 @graph eq base = 0.5
 
-@param 0 name = "Intensity"  default = 1.0  transform = range[   0, 100]      format = percent 
-@param 1 name = "Radius"     default = 0.1  transform = power[   1, 512, 3]   format = default 
-@param 2 name = "Peaks"      default = 1.0  transform = range[-100, 100]      format = percent 
-@param 3 name = "Valleys"    default = 1.0  transform = range[-100, 100]      format = percent
-@param 4 name = "Pivot"      default = 0.5  transform = range[-100, 100]      format = percent
+@param 0 name = "Intensity"  default = 1.0  center = 0.0  transform = range[   0, 100]      format = percent 
+@param 1 name = "Radius"     default = 0.1  center = 0.0  transform = power[   1, 512, 3]   format = default 
+@param 2 name = "Peaks"      default = 1.0  center = 0.5  transform = range[-100, 100]      format = percent 
+@param 3 name = "Valleys"    default = 1.0  center = 0.5  transform = range[-100, 100]      format = percent
+@param 4 name = "Pivot"      default = 0.5  center = 0.5  transform = range[-100, 100]      format = percent
 
 @data stereo_buffer running_sum
 

@@ -2,15 +2,17 @@
 // ------------------------------------------------
 
 @name "Limit"
+@author "Kaixo"
+@description "The Limit Alterant applies a limiter to each individual spectral bin."
 @inplace true
 
 @graph eq base = 0.5
 
-@param 0 name = "Mix"      default = 1.0  transform = range[   0, 100]   format = percent 
-@param 1 name = "Gain"     default = 0.5  transform = range[   0, 200]   format = percent 
-@param 2 name = "Offset"   default = 1.0  transform = range[-100,   0]   format = percent 
-@param 3 name = "Attack"   default = 0.0  transform = power[0, 1000, 3]  format = time 
-@param 4 name = "Release"  default = 0.0  transform = power[0, 1000, 3]  format = time 
+@param 0 name = "Mix"      default = 1.0  center = 0.0  transform = range[   0, 100]   format = percent 
+@param 1 name = "Gain"     default = 0.5  center = 0.0  transform = range[   0, 200]   format = percent 
+@param 2 name = "Offset"   default = 1.0  center = 1.0  transform = range[-100,   0]   format = percent 
+@param 3 name = "Attack"   default = 0.0  center = 0.0  transform = power[0, 1000, 3]  format = time 
+@param 4 name = "Release"  default = 0.0  center = 0.0  transform = power[0, 1000, 3]  format = time 
 
 @data stereo_buffer envelope
 

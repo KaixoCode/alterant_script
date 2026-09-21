@@ -2,15 +2,17 @@
 // ------------------------------------------------
 
 @name "Level"
+@author "Kaixo"
+@description "The Level Alterant gives precise control over the level of individual spectral bins, as well as width and pan controls."
 @inplace true
 
 @graph eq base = 0.5
 
-@param 0 name = "Graph"   default = 1.0  transform = range[-100, 100]  format = percent 
-@param 1 name = "Gain"    default = 0.5  transform = range[   0, 200]  format = percent 
-@param 2 name = "Offset"  default = 1.0  transform = range[-100, 0  ]  format = percent 
-@param 3 name = "Width"   default = 1.0  transform = range[-100, 100]  format = percent
-@param 4 name = "Pan"     default = 0.5  transform = range[-100, 100]  format = pan 
+@param 0 name = "Graph"   default = 1.0  center = 0.5  transform = range[-100, 100]  format = percent 
+@param 1 name = "Gain"    default = 0.5  center = 0.0  transform = range[   0, 200]  format = percent 
+@param 2 name = "Offset"  default = 1.0  center = 1.0  transform = range[-100, 0  ]  format = percent 
+@param 3 name = "Width"   default = 1.0  center = 0.5  transform = range[-100, 100]  format = percent
+@param 4 name = "Pan"     default = 0.5  center = 0.5  transform = range[-100, 100]  format = pan 
 
 // ------------------------------------------------
 

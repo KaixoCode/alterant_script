@@ -1,0 +1,53 @@
+
+// ------------------------------------------------
+
+@name "Filter"
+@author "Kaixo"
+@description "The Filter Alterant let's you draw a filter curve to filter the spectral bins like a normal filter."
+@inplace false
+
+@graph line base = 0.0 points = [0.5,0.5,2] [1,0,0]
+
+@param 0 name = "Mix"        default = 1.0  center = 0.0  transform = range[   0, 100]  format = percent 
+@param 1 name = "Cutoff"     default = 0.6  center = 0.0  transform = range[   0, 100]  format = percent 
+@param 2 name = "Stretch"    default = 0.5  center = 0.5  transform = range[-400, 400]  format = percent
+@param 3 name = "Log"        default = 1.0  center = 0.0  transform = range[   0, 100]  format = percent
+@param 4 name = "Key Track"  default = 0.5  center = 0.5  transform = range[-100, 100]  format = percent
+
+// ------------------------------------------------
+
+param2 = 1 - param[2]
+
+mix = clamp(param[0], 0, 1)
+cutoff = param[1]
+stretch = param2 < 0.5 ? (1 / (5 - 8 * param2)) : (8 * param2 - 3)
+log = clamp(param[3], 0, 1)
+keytrack = param[4] * 2 - 1
+
+// ------------------------------------------------
+
+cutoffMultiplier = pow(frequency / 440.0, keytrack)
+
+minFreq = 20.0
+logCutoffFreq = minFreq * pow(nyquist / minFreq, cutoff)
+logTrackedCutoff = logCutoffFreq * cutoffMultiplier
+logScale = log(nyquist / minFreq)
+linCutoffFreq = minFreq + cutoff * (nyquist - minFreq)
+linTrackedCutoff = linCutoffFreq * cutoffMultiplier
+
+// ------------------------------------------------
+
+freq = max(i * nyquist / size, minFreq)
+logGraphPos = log(freq / logTrackedCutoff) / logScale
+linGraphPos = (freq - linTrackedCutoff) / (nyquist - minFreq)
+
+graphPos = stretch * lerp(log, linGraphPos, logGraphPos)
+graphIndex = size * 0.5 + graphPos * size
+
+if (wrap) {
+  output = lerp(mix, input, 2 * input * graph[graphIndex : wrap linear])
+} else {
+  output = lerp(mix, input, 2 * input * graph[graphIndex : clamp linear])
+}
+
+// ------------------------------------------------

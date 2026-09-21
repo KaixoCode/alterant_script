@@ -275,7 +275,26 @@ Usage: `@name <string|identifier>`
 Examples:
 ```
 @name "A Name"
-@name Word
+```
+
+### `@author`
+The name of the author that created this alterant.
+
+Usage: `@author <string|identifier>`
+
+Examples:
+```
+@author "A Name"
+```
+
+### `@description`
+A description of what the alterant does.
+
+Usage: `@description <string|identifier>`
+
+Examples:
+```
+@description "This is an example alterant."
 ```
 
 ### `@inplace`
@@ -311,7 +330,7 @@ Examples:
 ### `@param`
 Configure parameters. Only parameters added as a config and have been given a name show up in the UI.
 
-Usage: `@param <0|1|2|3|4> [name=<string|identifier>] [default=<number>] [transform=<transform>] [format=<format>]`
+Usage: `@param <0|1|2|3|4> [name=<string|identifier>] [default=<number>] [center=<number>] [transform=<transform>] [format=<format>]`
 
 Where `<transform>` is one of:
 - `default`

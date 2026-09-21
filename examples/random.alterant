@@ -2,6 +2,8 @@
 // ------------------------------------------------
 
 @name "Rand"
+@author "Kaixo"
+@description "The Random Alterant randomly disables spectral bins based on the integrity and cycle speed."
 @inplace false
 
 @graph eq base = 0.5

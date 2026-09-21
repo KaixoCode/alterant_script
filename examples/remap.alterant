@@ -2,15 +2,17 @@
 // ------------------------------------------------
 
 @name "Remap"
+@author "Kaixo"
+@description "The Remap Alterant let's you remap the spectral bins to an arbitrary configuration using the graph."
 @inplace false
 
 @graph line points = [0, 0] [1, 1] 
 
-@param 0 name = "Mix"       default = 1.0  transform = range[   0, 100]  format = percent
-@param 1 name = "Morph"     default = 0.0  transform = range[   0, 100]  format = percent
-@param 2 name = "Offset"    default = 0.5  transform = range[-100, 100]  format = percent
-@param 3 name = "Shift"     default = 0.5  transform = range[-400, 400]  format = percent
-@param 4 name = "Key Track" default = 0.0  transform = range[   0, 100]  format = percent
+@param 0 name = "Mix"       default = 1.0  center = 0.0  transform = range[   0, 100]  format = percent
+@param 1 name = "Morph"     default = 0.0  center = 0.0  transform = range[   0, 100]  format = percent
+@param 2 name = "Offset"    default = 0.5  center = 0.5  transform = range[-100, 100]  format = percent
+@param 3 name = "Shift"     default = 0.5  center = 0.5  transform = range[-400, 400]  format = percent
+@param 4 name = "Key Track" default = 0.0  center = 0.0  transform = range[   0, 100]  format = percent
 
 // ------------------------------------------------
 

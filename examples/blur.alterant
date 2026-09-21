@@ -2,6 +2,8 @@
 // ------------------------------------------------
 
 @name "Blur"
+@author "Kaixo"
+@description "The Blur Alterant applies blur to the entire spectral buffer."
 @inplace false
 
 @graph eq base = 0.5

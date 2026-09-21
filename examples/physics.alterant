@@ -2,6 +2,8 @@
 // ------------------------------------------------
 
 @name "Phys"
+@author "Kaixo"
+@description "The Physics Alterant simulates velocity and acceleration based on the graph for each individual spectral bin."
 @inplace false
 
 @graph eq base = 0.5

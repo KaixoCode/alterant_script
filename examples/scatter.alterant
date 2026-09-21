@@ -2,6 +2,8 @@
 // ------------------------------------------------
 
 @name "Scat"
+@author "Kaixo"
+@description "The Scatter Alterant randomly scatters the spectral bins a certain distance at a certain speed."
 @inplace false
 
 @graph eq base = 0.5

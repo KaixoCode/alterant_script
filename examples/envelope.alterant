@@ -2,6 +2,8 @@
 // ------------------------------------------------
 
 @name "Env"
+@author "Kaixo"
+@description "The Envelope Alterant applies a smoothing envelope to each individual spectral bin."
 @inplace true
 
 @graph eq base = 0.5
