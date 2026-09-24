@@ -26,9 +26,9 @@ param3 = max(param[3], 0)
 // ------------------------------------------------
 
 mix = param0
-attack_samples = param1 * param1 * 10 * sample_rate
-release_samples = param2 * param2 * 10 * sample_rate
-hold_samples = param3 * param3 * 10 * sample_rate
+attack_samples = time_to_samples(param1 * param1, 0, 10000)
+release_samples = time_to_samples(param2 * param2, 0, 10000)
+hold_samples = time_to_samples(param3 * param3, 0, 10000)
 
 // ------------------------------------------------
 

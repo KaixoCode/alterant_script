@@ -28,7 +28,7 @@ param4 = clamp(param[4], 0, 1);
 // ------------------------------------------------
 
 mix = param0;
-base_cycle = (1 + 999 * param1 * param1) * 0.001 * sample_rate;
+base_cycle = time_to_samples(param1 * param1, 1, 1000)
 integrity = param2 * 0.99 + 0.01;
 speed_randomness = 2 * param3;
 stereo_amount = param4 * param4 * param4;
@@ -53,7 +53,7 @@ random_state_stereo = stereo(noise(0, 1), noise(0, 1))
 random_state = use_mono ? random_state_mono : random_state_stereo
 new_state = random_state < local_integrity ? 1 : 0
 
-counter = expired ? new_cycle : counter
+counter = expired ? new_cycle + counter : counter
 state   = expired ? new_state : state
 
 counter = counter - 1

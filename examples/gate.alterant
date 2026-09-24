@@ -28,8 +28,8 @@ param4 = max(param[4], 0)
 mix = param0
 morph = 1 - param1
 offset = param[2] * 2 - 1
-attack  = exp(-1 / (0.000000001 + pow(param3, 3) * sample_rate))
-release = exp(-1 / (0.000000001 + pow(param4, 3) * sample_rate))
+attack = time_to_coefficient(pow(param3, 3), 0, 1000)
+release = time_to_coefficient(pow(param4, 3), 0, 1000)
 
 // ------------------------------------------------
 

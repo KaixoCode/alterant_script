@@ -110,31 +110,33 @@ There are also some built-in functions. Custom functions are not supported.
 All of these functions support all types as arguments, unless otherwise specified. 
 Mixing different types behaves the same as defined above.
 
-| Function         | What does it do |
-| ---------------- | --------------- |
-| `noise()`        | Generate a buffer of random values between `0` and `1`. |
-| `noise(a)`       | Generate a buffer of random values between `0` and `a`. `a` must be a constant. |
-| `noise(a, b)`    | Generate a buffer of random values between `a` and `b`. `a` and `b` must be a constant. |
-| `random()`       | Generate a random value between `0` and `1`. |
-| `random(a)`      | Generate a random value between `0` and `a`. `a` must be a constant. |
-| `random(a, b)`   | Generate a random value between `a` and `b`. `a` and `b` must be a constant. |
-| `stereo(a)`      | Construct a stereo value from mono value `a`: `{ a, a }`. Works for both mono scalar and mono buffer values. |
-| `stereo(a, b)`   | Construct a stereo value from mono values `a` and `b`: `{ a, b }`. Works for both mono scalar and mono buffer values. |
-| `floor(a)`       | Rounds `a` towards negative infinity. |
-| `trunc(a)`       | Rounds `a` towards `0`. |
-| `ceil(a)`        | Rounds `a` towards positive infinity. |
-| `round(a)`       | Rounds `a` towards the nearest integer. |
-| `abs(a)  `       | Calculate the absolute value of `a`. |
-| `sqrt(a)`        | Calculate the square root of `a`. |
-| `sin(a)`         | Calculate sin of `a`. Uses a fast polynomial approximation. |
-| `cos(a)`         | Calculate cos of `a`. Uses a fast polynomial approximation. |
-| `log(a)`         | Calculate log of `a`. |
-| `exp(a)`         | Calculate exp of `a`. |
-| `pow(a, b)`      | Calculate `a` to the power `b`. |
-| `min(a, b)`      | Returns the smallest between `a` and `b`. Equivalent to `a < b ? a : b`. |
-| `max(a, b)`      | Returns the largest between `a` and `b`. Equivalent to `a < b ? b : a`. |  
-| `clamp(a, b, c)` | Clamp `a` between `b` and `c`. Equivalent to `min(max(a, b), c)`. |
-| `lerp(a, b, c)`  | Linearly interpolate between `b` and `c` using `a`. Equivalent to `b + a * (c - b)`. |
+| Function                        | What does it do |
+| ------------------------------- | --------------- |
+| `noise()`                       | Generate a buffer of random values between `0` and `1`. |
+| `noise(a)`                      | Generate a buffer of random values between `0` and `a`. `a` must be a constant. |
+| `noise(a, b)`                   | Generate a buffer of random values between `a` and `b`. `a` and `b` must be a constant. |
+| `random()`                      | Generate a random value between `0` and `1`. |
+| `random(a)`                     | Generate a random value between `0` and `a`. `a` must be a constant. |
+| `random(a, b)`                  | Generate a random value between `a` and `b`. `a` and `b` must be a constant. |
+| `stereo(a)`                     | Construct a stereo value from mono value `a`: `{ a, a }`. Works for both mono scalar and mono buffer values. |
+| `stereo(a, b)`                  | Construct a stereo value from mono values `a` and `b`: `{ a, b }`. Works for both mono scalar and mono buffer values. |
+| `floor(a)`                      | Rounds `a` towards negative infinity. |
+| `trunc(a)`                      | Rounds `a` towards `0`. |
+| `ceil(a)`                       | Rounds `a` towards positive infinity. |
+| `round(a)`                      | Rounds `a` towards the nearest integer. |
+| `abs(a)  `                      | Calculate the absolute value of `a`. |
+| `sqrt(a)`                       | Calculate the square root of `a`. |
+| `sin(a)`                        | Calculate sin of `a`. Uses a fast polynomial approximation. |
+| `cos(a)`                        | Calculate cos of `a`. Uses a fast polynomial approximation. |
+| `log(a)`                        | Calculate log of `a`. |
+| `exp(a)`                        | Calculate exp of `a`. |
+| `pow(a, b)`                     | Calculate `a` to the power `b`. |
+| `min(a, b)`                     | Returns the smallest between `a` and `b`. Equivalent to `a < b ? a : b`. |
+| `max(a, b)`                     | Returns the largest between `a` and `b`. Equivalent to `a < b ? b : a`. |  
+| `clamp(a, b, c)`                | Clamp `a` between `b` and `c`. Equivalent to `min(max(a, b), c)`. |
+| `lerp(a, b, c)`                 | Linearly interpolate between `b` and `c` using `a`. Equivalent to `b + a * (c - b)`. |
+| `time_to_samples(a, b, c)`      | Convert a time parameter `a` in the range of `b` to `c` milliseconds to a number of samples. Takes into account the alterant tempo sync mode and sample rate. |
+| `time_to_coefficient(a, b, c)`  | Convert a time parameter `a` in the range of `b` to `c` milliseconds to an envelope coefficient. Takes into account the alterant tempo sync mode and sample rate. |
 
 ## Indexing
 Another powerful feature is the ability to index into buffers using expressions. And it is possible to configure how to handle boundaries, and whether to do any interpolation when the index is not a whole number. 
