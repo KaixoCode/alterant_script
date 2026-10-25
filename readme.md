@@ -86,14 +86,19 @@ Each script has access to some globals. Here is that list of globals:
 | trigger       | Boolean that is only true once when the voice that this alterant influences has been triggered. Can be used to initialize or reset values. |
 | deterministic | Boolean, corresponds with the 'fixed' toggle in the UI.    |
 | wrap          | Boolean, corresponds with the 'wrap' toggle in the UI.     |
-| stereo        | Boolean, corresponds with the 'stereo' toggle in the UI.   |
+| cepstral      | Boolean, corresponds with the 'cepstral' toggle in the UI. | 
+| logarithmic   | Boolean, corresponds with the 'log' toggle in the UI.      |
+| synced        | Boolean, corresponds with the 'sync' toggle in the UI.     |
+| stereo        | Boolean, true when the left/right or mid/side graphs are not linked together.   |
 | input         | Stereo buffer containing the input spectral data. |
 | graph         | Stereo buffer containing the graph.               |
+| graphs        | Access any of the individual graphs in the graph list, index must be a constant, i.e. `graphs[2]` |
 | output        | Stereo buffer to write the result to.             |
 | bipolar       | Boolean that is true if the data coming into the alterant is bipolar. If any bipolar table feeds data into this alterant, it is set to true. |
 | key_tracked   | Boolean that is true if the data coming into the alterant is key tracked. If all tables that feed into this alterant are key tracked, it is set to true. |
 | phase_data    | Boolean that is true if the data coming into the alterant is phase data. If all tables that feed into this alterant are phase data, it is set to true. |
 | interpolate   | Boolean that is true if the data coming into the alterant is interpolated. If any interpolated table feeds data into this alterant, it is set to true. |
+| mid_side      | Boolean that is true if the data coming into the alterant is mid/side data. If any table that feeds into this alterant is mid/side, it is set to true. |
 | nyquist       | The highest frequency represented in the spectral data. This is half the sample-rate of the audio that was analyzed to create this spectral data. |
 | hop_size      | Distance in samples between consecutive frames from the incoming spectral data. If multiple tables feed into this alterant, the highest hop size is taken. |
 | overlap       | The amount of overlap between consecutive frames from the incoming spectral data. Either 1, 2, 4, or 8. If multiple tables feed into this alterant, the highest overlap is taken. |
@@ -137,6 +142,8 @@ Mixing different types behaves the same as defined above.
 | `lerp(a, b, c)`                 | Linearly interpolate between `b` and `c` using `a`. Equivalent to `b + a * (c - b)`. |
 | `time_to_samples(a, b, c)`      | Convert a time parameter `a` in the range of `b` to `c` milliseconds to a number of samples. Takes into account the alterant tempo sync mode and sample rate. |
 | `time_to_coefficient(a, b, c)`  | Convert a time parameter `a` in the range of `b` to `c` milliseconds to an envelope coefficient. Takes into account the alterant tempo sync mode and sample rate. |
+| `cepstral_lifter(a, b)`         | Applies the cepstral lifter `b` to the data in `a`. Either returns a buffer or stereo buffer, depending on whether any arguments are stereo or not. |
+| `cepstral_combine(a, b, c)`     | Recombines the modified liftered buffer `a` with the original buffer `b`, using the unmodified liftered signal `c`. For proper recombining, `c` must be the unaltered version of `a`. |
 
 ## Indexing
 Another powerful feature is the ability to index into buffers using expressions. And it is possible to configure how to handle boundaries, and whether to do any interpolation when the index is not a whole number. 
@@ -315,7 +322,7 @@ Examples:
 ### `@graph`
 Configure the default graph when initializing this alterant.
 
-Usage: `@graph <line|eq|bar|none> [base=<number>] [points=<points>]`
+Usage: `@graph <line|eq|bar|none> [wrap=<true|false>] [log=<true|false>] [base=<number>] [points=<points>]`
 
 Where `<points>` is 1 or more `[<number>, <number>]` or `[<number>, <number>, <number>]` separated by spaces.
 
