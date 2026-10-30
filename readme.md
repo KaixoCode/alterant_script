@@ -91,8 +91,9 @@ Each script has access to some globals. Here is that list of globals:
 | synced        | Boolean, corresponds with the 'sync' toggle in the UI.     |
 | stereo        | Boolean, true when the left/right or mid/side graphs are not linked together.   |
 | input         | Stereo buffer containing the input spectral data. |
+| inputs        | When multi-layer mode is active, this contains the 3 layers of data. The index must be a constant, i.e. `inputs[0]`. |
 | graph         | Stereo buffer containing the graph.               |
-| graphs        | Access any of the individual graphs in the graph list, index must be a constant, i.e. `graphs[2]` |
+| graphs        | Access any of the individual graphs in the graph list, index must be a constant, i.e. `graphs[2]`. |
 | output        | Stereo buffer to write the result to.             |
 | bipolar       | Boolean that is true if the data coming into the alterant is bipolar. If any bipolar table feeds data into this alterant, it is set to true. |
 | key_tracked   | Boolean that is true if the data coming into the alterant is key tracked. If all tables that feed into this alterant are key tracked, it is set to true. |
@@ -102,6 +103,7 @@ Each script has access to some globals. Here is that list of globals:
 | nyquist       | The highest frequency represented in the spectral data. This is half the sample-rate of the audio that was analyzed to create this spectral data. |
 | hop_size      | Distance in samples between consecutive frames from the incoming spectral data. If multiple tables feed into this alterant, the highest hop size is taken. |
 | overlap       | The amount of overlap between consecutive frames from the incoming spectral data. Either 1, 2, 4, or 8. If multiple tables feed into this alterant, the highest overlap is taken. |
+| current_layer | When in multi-layer mode is active, this is the current layer that is being processed. Meaning `output` corresponds to the output of this layer.  |
 
 Note that these are treated as keywords, you cannot define any variable with these names.
 
@@ -133,6 +135,9 @@ Mixing different types behaves the same as defined above.
 | `sqrt(a)`                       | Calculate the square root of `a`. |
 | `sin(a)`                        | Calculate sin of `a`. Uses a fast polynomial approximation. |
 | `cos(a)`                        | Calculate cos of `a`. Uses a fast polynomial approximation. |
+| `asin(a)`                       | Calculate asin of `a`. |
+| `acos(a)`                       | Calculate acos of `a`. |
+| `atan2(x, y)`                   | Calculate atan2 of `x`, `y`. |
 | `log(a)`                        | Calculate log of `a`. |
 | `exp(a)`                        | Calculate exp of `a`. |
 | `pow(a, b)`                     | Calculate `a` to the power `b`. |
@@ -144,6 +149,11 @@ Mixing different types behaves the same as defined above.
 | `time_to_coefficient(a, b, c)`  | Convert a time parameter `a` in the range of `b` to `c` milliseconds to an envelope coefficient. Takes into account the alterant tempo sync mode and sample rate. |
 | `cepstral_lifter(a, b)`         | Applies the cepstral lifter `b` to the data in `a`. Either returns a buffer or stereo buffer, depending on whether any arguments are stereo or not. |
 | `cepstral_combine(a, b, c)`     | Recombines the modified liftered buffer `a` with the original buffer `b`, using the unmodified liftered signal `c`. For proper recombining, `c` must be the unaltered version of `a`. |
+| `reduce(a, operation)`          | Reduce the buffer `a` using an operation: `sum`, `product`, `min`, `max`, `absmin` (smallest absolute value), `absmax` (biggest absolute value), `argmin` (index of the smallest number), `argmax` (index of the largest number), `count` (number of non-zero numbers), `any` (true if any non-zero numbers), `all` (true if only non-zero numbers). |
+| `scan(a, operation)`            | Works the same as `reduce`, except it returns a buffer with all intermediate values. So for example `scan(a, sum)` returns the running sum of `a`.   |
+| `sort(a)`                       | Sort buffer `a`. |
+| `argsort(a)`                    | Returns a buffer of indices that corresponds to the sorted permutation of `a`, such that `sort(a) == a[argsort(a)]`. |
+| `convolve(a, b, size, pos, boundary)` | Apply a convolution over the buffer `a` using the kernel `b`, set the size of the kernel using `size`, must be an integer constant between 1 and 512. `pos` decides the position of the kernel, must be one of: `causal`, `centered`, or `forward`. `boundary` determines how the boundary is handled, must be one of: `zero`, `wrap`, or `clamp`. |
 
 ## Indexing
 Another powerful feature is the ability to index into buffers using expressions. And it is possible to configure how to handle boundaries, and whether to do any interpolation when the index is not a whole number. 
