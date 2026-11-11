@@ -157,7 +157,7 @@ Mixing different types behaves the same as defined above.
 | `reverse(a)`                    | Reverse buffer `a`. |
 | `sort(a)`                       | Sort buffer `a`. |
 | `argsort(a)`                    | Returns a buffer of indices that corresponds to the sorted permutation of `a`, such that `sort(a) == a[argsort(a)]`. |
-| `convolve(a, b, size, pos, boundary)` | Apply a convolution over the buffer `a` using the kernel `b`, set the size of the kernel using `size`, must be an integer constant between 1 and 512. `pos` decides the position of the kernel, must be one of: `causal`, `centered`, or `forward`. `boundary` determines how the boundary is handled, must be one of: `zero`, `wrap`, or `clamp`. |
+| `convolve(a, b, size, pos, boundary)` | Apply a convolution over the buffer `a` using the kernel `b`, set the size of the kernel using `size`. `pos` decides the position of the kernel, must be one of: `causal`, `centered`, or `forward`. `boundary` determines how the boundary is handled, must be one of: `zero`, `wrap`, or `clamp`. |
 | `snap_frequency_to_scale(freq, scale)` | Snap the frequency to a frequency in the given scale. Use the value of a parameter with format=Scale as `scale`. | 
 | `snap_note_to_scale(note, scale)` | Snap the note to a note in the given scale. Use the value of a parameter with format=Scale as `scale`. | 
 | `note_in_scale(note, scale)` | Test whether the given note number is in the scale. Use the value of a parameter with format=Scale as `scale`. | 
@@ -426,7 +426,7 @@ Where `<transform>` is one of:
 - `bipolar_inverted_power[<number>,<number>,<number>]`
 - `decibels[<number>,<number>]`
 
-Where `<format>` is one of: `default`, `integer`, `decibels`, `percent`, `frequency`, `pan`, `time`, `detune`, `multiplier`.
+Where `<format>` is one of: `default`, `integer`, `decibels`, `percent`, `frequency`, `pan`, `time`, `detune`, `multiplier`, `scale`.
 
 Examples:
 ```
