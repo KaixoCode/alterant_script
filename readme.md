@@ -94,6 +94,7 @@ Each script has access to some globals. Here is that list of globals:
 | inputs        | When multi-layer mode is active, this contains the 3 layers of data. The index must be a constant, i.e. `inputs[0]`. |
 | graph         | Stereo buffer containing the graph.               |
 | graphs        | Access any of the individual graphs in the graph list, index must be a constant, i.e. `graphs[2]`. |
+| graph_mode    | Integer corresponding with the currently selected graph mode, see `@graph_modes` |
 | output        | Stereo buffer to write the result to.             |
 | bipolar       | Boolean that is true if the data coming into the alterant is bipolar. If any bipolar table feeds data into this alterant, it is set to true. |
 | key_tracked   | Boolean that is true if the data coming into the alterant is key tracked. If all tables that feed into this alterant are key tracked, it is set to true. |
@@ -103,7 +104,9 @@ Each script has access to some globals. Here is that list of globals:
 | nyquist       | The highest frequency represented in the spectral data. This is half the sample-rate of the audio that was analyzed to create this spectral data. |
 | hop_size      | Distance in samples between consecutive frames from the incoming spectral data. If multiple tables feed into this alterant, the highest hop size is taken. |
 | overlap       | The amount of overlap between consecutive frames from the incoming spectral data. Either 1, 2, 4, or 8. If multiple tables feed into this alterant, the highest overlap is taken. |
-| current_layer | When in multi-layer mode is active, this is the current layer that is being processed. Meaning `output` corresponds to the output of this layer.  |
+| current_layer | When multi-layer mode is active, this is the current layer that is being processed. Meaning `output` corresponds to the output of this layer.  |
+| multi_layer   | True when multi-layered processing is enabled. |
+| modulator     | Scalar value that can be used as a modulation source. Using this variable in your script enables the modulator. Right-click your custom alterant to link it to 1 of the 5 spectral modulation sources. |
 
 Note that these are treated as keywords, you cannot define any variable with these names.
 
@@ -151,9 +154,15 @@ Mixing different types behaves the same as defined above.
 | `cepstral_combine(a, b, c)`     | Recombines the modified liftered buffer `a` with the original buffer `b`, using the unmodified liftered signal `c`. For proper recombining, `c` must be the unaltered version of `a`. |
 | `reduce(a, operation)`          | Reduce the buffer `a` using an operation: `sum`, `product`, `min`, `max`, `absmin` (smallest absolute value), `absmax` (biggest absolute value), `argmin` (index of the smallest number), `argmax` (index of the largest number), `count` (number of non-zero numbers), `any` (true if any non-zero numbers), `all` (true if only non-zero numbers). |
 | `scan(a, operation)`            | Works the same as `reduce`, except it returns a buffer with all intermediate values. So for example `scan(a, sum)` returns the running sum of `a`.   |
+| `reverse(a)`                    | Reverse buffer `a`. |
 | `sort(a)`                       | Sort buffer `a`. |
 | `argsort(a)`                    | Returns a buffer of indices that corresponds to the sorted permutation of `a`, such that `sort(a) == a[argsort(a)]`. |
 | `convolve(a, b, size, pos, boundary)` | Apply a convolution over the buffer `a` using the kernel `b`, set the size of the kernel using `size`, must be an integer constant between 1 and 512. `pos` decides the position of the kernel, must be one of: `causal`, `centered`, or `forward`. `boundary` determines how the boundary is handled, must be one of: `zero`, `wrap`, or `clamp`. |
+| `snap_frequency_to_scale(freq, scale)` | Snap the frequency to a frequency in the given scale. Use the value of a parameter with format=Scale as `scale`. | 
+| `snap_note_to_scale(note, scale)` | Snap the note to a note in the given scale. Use the value of a parameter with format=Scale as `scale`. | 
+| `note_in_scale(note, scale)` | Test whether the given note number is in the scale. Use the value of a parameter with format=Scale as `scale`. | 
+| `scale_midi(scale)` | Test whether midi mode is enabled for the given scale. Use the value of a parameter with format=Scale as `scale`. | 
+
 
 ## Indexing
 Another powerful feature is the ability to index into buffers using expressions. And it is possible to configure how to handle boundaries, and whether to do any interpolation when the index is not a whole number. 
@@ -287,13 +296,23 @@ counter = counter + 1
 
 ## Configuration
 ### `@name`
-The name that will be displayed in the UI.
+The name that will be displayed in the browser view.
 
 Usage: `@name <string|identifier>`
 
 Examples:
 ```
 @name "A Name"
+```
+
+### `@short_name`
+The name that will be displayed in the UI, if ommitted, `@name` will be used.
+
+Usage: `@short_name <string|identifier>`
+
+Examples:
+```
+@short_name "Name"
 ```
 
 ### `@author`
@@ -329,6 +348,36 @@ Examples:
 @inplace false
 ```
 
+### `@sync`
+Whether sync mode is enabled by default.
+
+Usage: `@sync <true|false>`
+
+Defaults to: `@sync false`
+
+Examples:
+```
+@sync true
+@sync false
+```
+
+### `@layers`
+In multi-layer mode, which layers this alterant processes by default.
+
+Usage: `@layers <0|1|2|level|frequency|phase|all> <0|1|2|level|frequency|phase> <0|1|2|level|frequency|phase>`
+
+Defaults to: `@layers 0`
+
+Where `level` is the same as 0, `frequency` is the same as 1, and `phase` is the same as 2. `all` is equivalent to `0 1 2`.
+
+Examples:
+```
+@layers 0 1 2
+@layers all
+@layers level
+@layers frequency
+```
+
 ### `@graph`
 Configure the default graph when initializing this alterant.
 
@@ -344,6 +393,22 @@ Examples:
 @graph eq base = 0.5 points = [0, 0, 2]
 @graph bar base = 0
 @graph line points = [0, 0] [1, 1]
+```
+
+### `@graph_modes`
+Add multiple graph modes. This gives you a way to have the graph mean different things. 
+For example, a compressor alterant might want to have the graph mean 'mix' or 'threshold'. 
+Adding these graph modes gives the user the ability to choose which one they want. 
+Read the current selected graph mode with the global variable `graph_mode`.
+
+Usage: `@graph_modes <mode_names>`
+
+Where `<mode_names>` is 1 or more string or identifier defining the names of the different graph modes.
+
+Examples:
+```
+@graph_modes Level Mix
+@graph_modes "Threshold" "Smooth" "Mix"
 ```
 
 ### `@param`
